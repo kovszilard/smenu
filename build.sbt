@@ -9,7 +9,9 @@ lazy val root = (project in file("."))
   .settings(
     name := "menu",
     libraryDependencies += scalaTest % Test,
-    libraryDependencies += cats
+    libraryDependencies += cats,
+    libraryDependencies += catsEffect,
+    libraryDependencies += jline
   )
 
 
