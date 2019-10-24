@@ -2,7 +2,6 @@ package menu
 
 import cats.data.NonEmptyList
 import cats.effect.{ExitCode, IO, IOApp}
-import cats.syntax.all._
 import cats.instances.all._
 
 object Example extends IOApp {

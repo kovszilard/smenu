@@ -2,8 +2,6 @@ package menu
 
 import cats.Show
 import cats.data.NonEmptyList
-import cats.syntax.NonEmptyTraverseSyntax
-import cats.instances.all._
 import cats.syntax.all._
 import cats.effect._
 import menu.KeyPress._
@@ -22,47 +20,18 @@ object Menus {
   }
 
 
-  def singleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[A] = IO(runSingleChoiceMenu(SingleChoiceMenu(title, options)))
-  def multipleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[List[A]] = IO(runMultipleChoiceMenu(MultipleChoiceMenu(title, options)))
+//  def singleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[A] = IO(runSingleChoiceMenu(SingleChoiceMenu(title, options)))
+  def singleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[A] = IO(runMenu(SingleChoiceMenu(title, options)).head)
+//  def multipleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[List[A]] = IO(runMultipleChoiceMenu(MultipleChoiceMenu(title, options)))
+  def multipleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[List[A]] = IO(runMenu(MultipleChoiceMenu(title, options)))
 
-  def runSingleChoiceMenu[A : Show](menu: SingleChoiceMenu[A]): A = {
+  def runMenu[A : Show](menu: Menu[A]): List[A] = {
 
-    def loop(lastKey: Option[KeyPress], menu: SingleChoiceMenu[A], terminal: Terminal): A = lastKey match {
-      case Some(Enter) => menu.options.get(menu.selected).get
-      case key =>
-        // bring cursor back to beginning of menu
-        menu.show.lines.foreach(_ => terminal.writer().print("\u001b[1A"))
-
-        // print new menu
-        val currentMenuState = changeState(key, menu)
-        terminal.writer().println(currentMenuState.show)
-        terminal.writer().flush()
-
-        val newKey = ReadArrow.readKey(terminal.reader())
-        loop(newKey, currentMenuState, terminal)
-    }
-
-    val terminal: Terminal = TerminalBuilder.builder()
-      .system(true)
-      .build()
-    terminal.enterRawMode()
-
-    terminal.writer().println(menu.show)
-    terminal.writer().flush()
-    val result = loop(ReadArrow.readKey(terminal.reader()), menu, terminal)
-
-    terminal.close()
-
-    result
-  }
-
-  def runMultipleChoiceMenu[A : Show](menu: MultipleChoiceMenu[A]): List[A] = {
-
-    def loop(lastKey: Option[KeyPress], menu: MultipleChoiceMenu[A], terminal: Terminal): List[A] = lastKey match {
+    def loop(lastKey: Option[KeyPress], menu: Menu[A], terminal: Terminal): List[A] = lastKey match {
       case Some(Enter) => menu.getResult
       case key =>
         // bring cursor back to beginning of menu
-        menu.show.lines.foreach(_ => terminal.writer().print("\u001b[1A"))
+        menu.show.linesIterator.foreach(_ => terminal.writer().print("\u001b[1A"))
 
         // print new menu
         val currentMenuState = changeState(key, menu)
@@ -91,26 +60,28 @@ object Menus {
 //  def singleChoiceMenu[F[_]](title: String, options: Seq[String], selected: Option[Int] = None): F[Int] = ???
 //  def singleChoiceMenu[F[_], A](title: String, options: Map[String, A], selected: Option[String] = None): F[A] = ???
 
-  implicit def singleChoiceMenuShow[A : Show]: Show[SingleChoiceMenu[A]] = new Show[SingleChoiceMenu[A]] {
-    def show(m: SingleChoiceMenu[A]): String = {
-      val options = m.options.zipWithIndex.map{ case (s, i) =>
-        if (i == m.selected) show"> $s"
-        else show"  $s"}
+  implicit def menuShow[A : Show]: Show[Menu[A]] = new Show[Menu[A]] {
+    def show(m: Menu[A]): String = m match {
+      case m: SingleChoiceMenu[A] =>
+        val options = m.options.zipWithIndex.map{ case (s, i) =>
+          if (i == m.selected) show"> $s"
+          else show"  $s"}
 
-      s"${m.title}\n${options.toList.mkString("\n")}"
+        s"${m.title}\n${options.toList.mkString("\n")}"
+      case m: MultipleChoiceMenu[A] =>
+        val options = m.options.zipWithIndex.map{ case (s, i) =>
+          val cursorPosStr = if (i == m.cursorPos) "> " else "  "
+          val rest = if (m.selected.contains(i)) show"[*] $s" else show"[_] $s"
+          cursorPosStr + rest
+        }
+
+        s"${m.title}\n${options.toList.mkString("\n")}"
     }
   }
 
-  implicit def multipleChoiceMenuShow[A : Show]: Show[MultipleChoiceMenu[A]] = new Show[MultipleChoiceMenu[A]] {
-    def show(m: MultipleChoiceMenu[A]): String = {
-      val options = m.options.zipWithIndex.map{ case (s, i) =>
-        val cursorPosStr = if (i == m.cursorPos) "> " else "  "
-        val rest = if (m.selected.contains(i)) show"[*] $s" else show"[_] $s"
-          cursorPosStr + rest
-      }
-
-      s"${m.title}\n${options.toList.mkString("\n")}"
-    }
+  def changeState[A](input: Option[KeyPress], m: Menu[A]): Menu[A] = m match {
+    case m: SingleChoiceMenu[A] => changeState(input, m)
+    case m: MultipleChoiceMenu[A] => changeState(input, m)
   }
 
   def changeState[A](input: Option[KeyPress], m: SingleChoiceMenu[A]): SingleChoiceMenu[A] = input match {
