@@ -17,8 +17,8 @@ object Example extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = for {
     result1 <- singleChoiceMenu[IO, String]("What is your favourite fruit?", NonEmptyList.of("Apple", "Banana", "Orange"))
-    _ <- IO(println(s"You choose: $result1\n"))
+    _ <- IO(println(s"Result: $result1\n"))
     result2 <- multipleChoiceMenu[IO, Pet]("Cats or dogs or both?", NonEmptyList.of(Cat, Dog))
-    _ <- IO(println(s"You choose: $result2"))
+    _ <- IO(println(s"Result: $result2"))
   } yield (ExitCode.Success)
 }
