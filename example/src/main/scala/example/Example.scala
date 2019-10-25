@@ -5,7 +5,7 @@ import cats.instances.all._
 import cats.syntax.all._
 import cats.data.NonEmptyList
 import cats.effect.{ExitCode, IO, IOApp}
-import menu.Menu
+import smenu.Menu
 
 object Example extends IOApp {
 

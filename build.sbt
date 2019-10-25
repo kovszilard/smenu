@@ -10,14 +10,14 @@ useGpgAgent := true
 useGpgPinentry := true
 
 lazy val root = (project in file("."))
-  .aggregate(menu, example)
+  .aggregate(smenu, example)
   .settings(
       skip in publish := true
   )
 
-lazy val menu = (project in file("menu"))
+lazy val smenu = (project in file("smenu"))
   .settings(
-      name := "menu",
+      name := "smenu",
       crossScalaVersions := Seq("2.13.1", "2.12.10"),
       libraryDependencies ++= Seq(scalaTest % Test, cats, catsEffect, jline),
       scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature", "-language:higherKinds")
@@ -29,4 +29,4 @@ lazy val example = (project in file("example"))
       crossScalaVersions := Seq("2.13.1", "2.12.10"),
     libraryDependencies ++= Seq(cats, catsEffect),
       skip in publish := true
-  ).dependsOn(menu)
+  ).dependsOn(smenu)

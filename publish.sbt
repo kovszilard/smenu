@@ -1,12 +1,12 @@
 ThisBuild / description := "Simple menus for Scala console applications"
-ThisBuild / homepage := Some(url("https://github.com/kovszilard/menu"))
+ThisBuild / homepage := Some(url("https://github.com/kovszilard/smenu"))
 ThisBuild / organizationHomepage := Some(url("https://github.com/kovszilard/"))
 ThisBuild / licenses := List("MIT" -> new URL("http://opensource.org/licenses/MIT"))
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
-    url("https://github.com/kovszilard/menu"),
-    "scm:git@github.com:kovszilard/menu.git"
+    url("https://github.com/kovszilard/smenu"),
+    "scm:git@github.com:kovszilard/smenu.git"
   )
 )
 

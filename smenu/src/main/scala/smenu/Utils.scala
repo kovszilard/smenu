@@ -1,4 +1,4 @@
-package menu
+package smenu
 
 import org.jline.utils.NonBlockingReader
 

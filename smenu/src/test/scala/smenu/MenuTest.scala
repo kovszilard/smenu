@@ -1,11 +1,11 @@
-package menu
+package smenu
 
 import cats.Show
 import cats.data.NonEmptyList
 import cats.instances.string._
 import cats.syntax.all._
-import menu.KeyPress._
-import menu.Menu._
+import smenu.KeyPress._
+import smenu.Menu._
 import org.scalatest._
 
 class MenuTest extends FlatSpec with Matchers {
