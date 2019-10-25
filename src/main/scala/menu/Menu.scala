@@ -1,5 +1,6 @@
 package menu
 
+import scala.language.higherKinds
 import cats.Show
 import cats.data.NonEmptyList
 import cats.syntax.all._
@@ -9,20 +10,20 @@ import org.jline.terminal.{Terminal, TerminalBuilder}
 
 object Menus {
 
-  def singleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[A] = IO(runMenu(SingleChoiceMenu(title, options)).head)
-  def multipleChoiceMenu[A : Show](title: String, options: NonEmptyList[A]): IO[List[A]] = IO(runMenu(MultipleChoiceMenu(title, options)))
+  def singleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[A] = implicitly[Sync[F]].delay(runMenu(SingleChoiceMenu(title, options)).head)
+  def multipleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[List[A]] = implicitly[Sync[F]].delay(runMenu(MultipleChoiceMenu(title, options)))
 
-  private trait Menu[A] {
+  private[menu] trait Menu[A] {
     def getResult: List[A]
   }
-  private case class SingleChoiceMenu[A](title: String, options: NonEmptyList[A], selected: Int = 0) extends Menu[A] {
+  private[menu] case class SingleChoiceMenu[A](title: String, options: NonEmptyList[A], selected: Int = 0) extends Menu[A] {
     def getResult: List[A] = options.get(selected).toList
   }
-  private case class MultipleChoiceMenu[A](title: String, options: NonEmptyList[A], cursorPos: Int = 0, selected: List[Int] = List.empty) extends Menu[A] {
+  private[menu] case class MultipleChoiceMenu[A](title: String, options: NonEmptyList[A], cursorPos: Int = 0, selected: List[Int] = List.empty) extends Menu[A] {
     def getResult: List[A] = selected.map(x => options.get(x).get)
   }
 
-  private def runMenu[A : Show](menu: Menu[A]): List[A] = {
+  private[menu] def runMenu[A : Show](menu: Menu[A]): List[A] = {
 
     def loop(lastKey: Option[KeyPress], menu: Menu[A], terminal: Terminal): List[A] = lastKey match {
       case Some(Enter) => menu.getResult
@@ -53,7 +54,7 @@ object Menus {
     result
   }
 
-  private implicit def menuShow[A : Show]: Show[Menu[A]] = new Show[Menu[A]] {
+  private[menu] implicit def menuShow[A : Show]: Show[Menu[A]] = new Show[Menu[A]] {
     def show(m: Menu[A]): String = m match {
       case m: SingleChoiceMenu[A] =>
         val options = m.options.zipWithIndex.map{ case (s, i) =>
@@ -72,18 +73,18 @@ object Menus {
     }
   }
 
-  private def changeState[A](input: Option[KeyPress], m: Menu[A]): Menu[A] = m match {
+  private[menu] def changeState[A](input: Option[KeyPress], m: Menu[A]): Menu[A] = m match {
     case m: SingleChoiceMenu[A] => changeState(input, m)
     case m: MultipleChoiceMenu[A] => changeState(input, m)
   }
 
-  private def changeState[A](input: Option[KeyPress], m: SingleChoiceMenu[A]): SingleChoiceMenu[A] = input match {
+  private[menu] def changeState[A](input: Option[KeyPress], m: SingleChoiceMenu[A]): SingleChoiceMenu[A] = input match {
     case Some(Up) if m.selected > 0 => m.copy(selected = m.selected - 1)
     case Some(Down) if m.selected < m.options.size - 1 => m.copy(selected = m.selected + 1)
     case _ => m
   }
 
-  private def changeState[A](input: Option[KeyPress], m: MultipleChoiceMenu[A]): MultipleChoiceMenu[A] = input match {
+  private[menu] def changeState[A](input: Option[KeyPress], m: MultipleChoiceMenu[A]): MultipleChoiceMenu[A] = input match {
     case Some(Up) if m.cursorPos > 0 => m.copy(cursorPos = m.cursorPos - 1)
     case Some(Down) if m.cursorPos < m.options.size - 1 => m.copy(cursorPos = m.cursorPos + 1)
     case Some(Space) if !m.selected.contains(m.cursorPos) => m.copy(selected = m.selected.appended(m.cursorPos).distinct)

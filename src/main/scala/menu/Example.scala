@@ -7,9 +7,9 @@ import cats.instances.all._
 object Example extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = for {
-    result1 <- Menus.singleChoiceMenu("What is your fruit?", NonEmptyList.of("Apple", "Banana", "Grapes"))
+    result1 <- Menus.singleChoiceMenu[IO, String]("What is your fruit?", NonEmptyList.of("Apple", "Banana", "Grapes"))
     _ <- IO(println(result1))
-    result2 <- Menus.multipleChoiceMenu("What is your fruit?", NonEmptyList.of("Apple", "Banana", "Grapes"))
+    result2 <- Menus.multipleChoiceMenu[IO, String]("What is your fruit?", NonEmptyList.of("Apple", "Banana", "Grapes"))
     _ <- IO(println(result2))
   } yield (ExitCode.Success)
 }

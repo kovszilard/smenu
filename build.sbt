@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
     libraryDependencies += cats,
     libraryDependencies += catsEffect,
     libraryDependencies += jline,
-    scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint")
+    scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature")
   )
 
 
