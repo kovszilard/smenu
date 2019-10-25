@@ -16,10 +16,10 @@ object Menu {
   private[menu] trait Menu[A] {
     def getResult: List[A]
   }
-  private[menu] case class SingleChoiceMenu[A](title: String, options: NonEmptyList[A], selected: Int = 0) extends Menu[A] {
+  private[menu] final case class SingleChoiceMenu[A](title: String, options: NonEmptyList[A], selected: Int = 0) extends Menu[A] {
     def getResult: List[A] = options.get(selected).toList
   }
-  private[menu] case class MultipleChoiceMenu[A](title: String, options: NonEmptyList[A], cursorPos: Int = 0, selected: List[Int] = List.empty) extends Menu[A] {
+  private[menu] final case class MultipleChoiceMenu[A](title: String, options: NonEmptyList[A], cursorPos: Int = 0, selected: List[Int] = List.empty) extends Menu[A] {
     def getResult: List[A] = selected.map(x => options.get(x).get)
   }
 
@@ -95,8 +95,8 @@ object Menu {
   }
 }
 
-trait KeyPress
-object KeyPress {
+private[menu] trait KeyPress
+private[menu] object KeyPress {
 
   case object Up extends KeyPress
   case object Down extends KeyPress
