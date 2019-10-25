@@ -10,8 +10,8 @@ import org.jline.terminal.{Terminal, TerminalBuilder}
 
 object Menus {
 
-  def singleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[A] = implicitly[Sync[F]].delay(runMenu(SingleChoiceMenu(title, options)).head)
-  def multipleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[List[A]] = implicitly[Sync[F]].delay(runMenu(MultipleChoiceMenu(title, options)))
+  def singleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[A] = runMenu(SingleChoiceMenu(title, options)).map(_.head)
+  def multipleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[List[A]] = runMenu(MultipleChoiceMenu(title, options))
 
   private[menu] trait Menu[A] {
     def getResult: List[A]
@@ -23,7 +23,7 @@ object Menus {
     def getResult: List[A] = selected.map(x => options.get(x).get)
   }
 
-  private[menu] def runMenu[A : Show](menu: Menu[A]): List[A] = {
+  private[menu] def runMenu[F[_] : Sync, A : Show](menu: Menu[A]): F[List[A]] = {
 
     def loop(lastKey: Option[KeyPress], menu: Menu[A], terminal: Terminal): List[A] = lastKey match {
       case Some(Enter) => menu.getResult
@@ -40,18 +40,20 @@ object Menus {
         loop(newKey, currentMenuState, terminal)
     }
 
-    val terminal: Terminal = TerminalBuilder.builder()
-      .system(true)
-      .build()
-    terminal.enterRawMode()
+    Sync[F].bracket{
+      Sync[F].delay(
+        TerminalBuilder.builder().system(true).build()
+      )
+    }{ terminal =>
+      terminal.enterRawMode()
 
-    terminal.writer().println(menu.show)
-    terminal.writer().flush()
-    val result = loop(Utils.readKey(terminal.reader()), menu, terminal)
-
-    terminal.close()
-
-    result
+      terminal.writer().println(menu.show)
+      terminal.writer().flush()
+      Sync[F].delay(loop(Utils.readKey(terminal.reader()), menu, terminal))
+    }{ terminal =>
+      terminal.close()
+      Sync[F].unit
+    }
   }
 
   private[menu] implicit def menuShow[A : Show]: Show[Menu[A]] = new Show[Menu[A]] {
