@@ -8,7 +8,7 @@ import cats.effect._
 import menu.KeyPress._
 import org.jline.terminal.{Terminal, TerminalBuilder}
 
-object Menus {
+object Menu {
 
   def singleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[A] = runMenu(SingleChoiceMenu(title, options)).map(_.head)
   def multipleChoiceMenu[F[_] : Sync, A : Show](title: String, options: NonEmptyList[A]): F[List[A]] = runMenu(MultipleChoiceMenu(title, options))

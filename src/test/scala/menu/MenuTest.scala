@@ -5,7 +5,7 @@ import cats.data.NonEmptyList
 import cats.instances.string._
 import cats.syntax.all._
 import menu.KeyPress._
-import menu.Menus._
+import menu.Menu._
 import org.scalatest._
 
 class MenuTest extends FlatSpec with Matchers {
