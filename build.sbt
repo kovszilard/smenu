@@ -1,19 +1,32 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.0"
+ThisBuild / scalaVersion     := "2.13.1"
 ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "com.example"
-ThisBuild / organizationName := "example"
+ThisBuild / organization     := "com.github.kovszilard"
+ThisBuild / organizationName := "kovszilard"
+
+useGpg := true
+useGpgAgent := true
+useGpgPinentry := true
 
 lazy val root = (project in file("."))
+  .aggregate(menu, example)
   .settings(
-    name := "menu",
-    libraryDependencies += scalaTest % Test,
-    libraryDependencies += cats,
-    libraryDependencies += catsEffect,
-    libraryDependencies += jline,
-    scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature")
+      skip in publish := true
   )
 
+lazy val menu = (project in file("menu"))
+  .settings(
+      name := "menu",
+      crossScalaVersions := Seq("2.13.1", "2.12.10"),
+      libraryDependencies ++= Seq(scalaTest % Test, cats, catsEffect, jline),
+      scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature", "-language:higherKinds")
+  )
 
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for instructions on how to publish to Sonatype.
+lazy val example = (project in file("example"))
+  .settings(
+      name := "example",
+      crossScalaVersions := Seq("2.13.1", "2.12.10"),
+    libraryDependencies ++= Seq(cats, catsEffect),
+      skip in publish := true
+  ).dependsOn(menu)

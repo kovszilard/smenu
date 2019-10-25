@@ -1,6 +1,5 @@
 package menu
 
-import scala.language.higherKinds
 import cats.Show
 import cats.data.NonEmptyList
 import cats.syntax.all._
@@ -89,7 +88,7 @@ object Menu {
   private[menu] def changeState[A](input: Option[KeyPress], m: MultipleChoiceMenu[A]): MultipleChoiceMenu[A] = input match {
     case Some(Up) if m.cursorPos > 0 => m.copy(cursorPos = m.cursorPos - 1)
     case Some(Down) if m.cursorPos < m.options.size - 1 => m.copy(cursorPos = m.cursorPos + 1)
-    case Some(Space) if !m.selected.contains(m.cursorPos) => m.copy(selected = m.selected.appended(m.cursorPos).distinct)
+    case Some(Space) if !m.selected.contains(m.cursorPos) => m.copy(selected = (m.selected ++ List(m.cursorPos)).distinct)
     case Some(Space) if m.selected.contains(m.cursorPos) => m.copy(selected = m.selected.filter(x => x != m.cursorPos))
     case _ => m
   }

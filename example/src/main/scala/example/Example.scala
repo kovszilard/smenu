@@ -1,10 +1,11 @@
-package menu
+package example
 
 import cats.Show
-import cats.data.NonEmptyList
-import cats.effect.{ExitCode, IO, IOApp}
 import cats.instances.all._
 import cats.syntax.all._
+import cats.data.NonEmptyList
+import cats.effect.{ExitCode, IO, IOApp}
+import menu.Menu
 
 object Example extends IOApp {
 
