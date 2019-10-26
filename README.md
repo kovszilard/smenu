@@ -34,7 +34,7 @@ import smenu.Menu._
 singleChoiceMenu[IO, String]("What is your favourite fruit?", NonEmptyList.of("Apple", "Banana", "Orange"))
 ```
 
-### Multile choice menu
+### Multiple choice menu
 
 ```scala
 // Using IO for effect, and Pet for menu elements
