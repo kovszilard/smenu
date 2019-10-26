@@ -6,6 +6,8 @@
 
 Simple menus for Scala console applications
 
+![Screenshot](Screenshot.png)
+
 ## Features
 
 * Functional API
