@@ -5,7 +5,6 @@ ThisBuild / version          := "0.1.0"
 ThisBuild / organization     := "com.github.kovszilard"
 ThisBuild / organizationName := "kovszilard"
 
-useGpg := true
 useGpgAgent := true
 useGpgPinentry := true
 
