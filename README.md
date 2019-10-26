@@ -1,6 +1,6 @@
-# smenu
+# Smenu
 [![Build Status](https://travis-ci.org/kovszilard/smenu.svg?branch=master)](https://travis-ci.org/kovszilard/smenu)
-[![Maven central](https://img.shields.io/maven-central/v/com.github.kovszilard/smenu_2.12)](https://search.maven.org/search?q=twitter-server-prometheus)
+[![Maven central](https://img.shields.io/maven-central/v/com.github.kovszilard/smenu_2.12)](https://search.maven.org/search?q=smenu)
 [![Tweet](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fkovszilard%2Fsmenu)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fkovszilard%2Fsmenu)
 [![Twitter follow](https://img.shields.io/twitter/follow/kovszilard?style=social)](https://twitter.com/intent/follow?screen_name=kovszilard)
 
