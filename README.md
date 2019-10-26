@@ -51,5 +51,5 @@ case object Dog extends Pet
 
 implicit def showPet: Show[Pet] = Show[String].contramap(_.toString)
 
-multipleChoiceMenu[IO, Pet]("Cats or dogs or both?", NonEmptyList.of(Cat, Dog)
+multipleChoiceMenu[IO, Pet]("Cats or dogs or both?", NonEmptyList.of(Cat, Dog))
 ```
