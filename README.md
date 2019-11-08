@@ -55,3 +55,7 @@ implicit def showPet: Show[Pet] = Show[String].contramap(_.toString)
 
 multipleChoiceMenu[IO, Pet]("Cats or dogs or both?", NonEmptyList.of(Cat, Dog))
 ```
+
+### Do you like this project? ❤️
+
+Please give it a star. It is just one click for you and it keeps me motivated to write open source tools like this.
