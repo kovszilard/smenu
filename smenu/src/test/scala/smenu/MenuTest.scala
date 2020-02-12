@@ -7,8 +7,10 @@ import cats.syntax.all._
 import smenu.KeyPress._
 import smenu.Menu._
 import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class MenuTest extends FlatSpec with Matchers {
+class MenuTest extends AnyFlatSpec with Matchers {
 
   "A SingleChoiceMenu" should "have a well formatted string representation" in {
 
