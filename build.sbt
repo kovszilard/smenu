@@ -1,9 +1,30 @@
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.13.1"
-ThisBuild / version          := "0.1.0"
+lazy val scala212 = "2.12.10"
+lazy val scala213 = "2.13.1"
+lazy val supportedScalaVersions = List(scala213, scala212)
+
+ThisBuild / scalaVersion     := scala213
 ThisBuild / organization     := "com.github.kovszilard"
 ThisBuild / organizationName := "kovszilard"
+
+import ReleaseTransformations._
+ThisBuild / releaseCrossBuild := true // true if you cross-build the project for multiple Scala versions
+ThisBuild / releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  // For non cross-build projects, use releaseStepCommand("publishSigned")
+  releaseStepCommandAndRemaining("+publishSigned"),
+  releaseStepCommand("sonatypeBundleRelease"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
 
 useGpgAgent := true
 useGpgPinentry := true
@@ -11,21 +32,22 @@ useGpgPinentry := true
 lazy val root = (project in file("."))
   .aggregate(smenu, example)
   .settings(
-      skip in publish := true
+    crossScalaVersions := Nil,
+    skip in publish := true
   )
 
 lazy val smenu = (project in file("smenu"))
   .settings(
-      name := "smenu",
-      crossScalaVersions := Seq("2.13.1", "2.12.10"),
-      libraryDependencies ++= Seq(scalaTest % Test, cats, catsEffect, jline),
-      scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature", "-language:higherKinds")
+    name := "smenu",
+    crossScalaVersions := supportedScalaVersions,
+    libraryDependencies ++= Seq(scalaTest % Test, cats, catsEffect, jline),
+    scalacOptions ++= Seq("-Xfatal-warnings", "-Xlint", "-feature", "-language:higherKinds"),
   )
 
 lazy val example = (project in file("example"))
   .settings(
-      name := "example",
-      crossScalaVersions := Seq("2.13.1", "2.12.10"),
-    libraryDependencies ++= Seq(cats, catsEffect),
-      skip in publish := true
+    name := "example",
+    crossScalaVersions := supportedScalaVersions,
+    skip in publish := true,
+    libraryDependencies ++= Seq(cats, catsEffect)
   ).dependsOn(smenu)
